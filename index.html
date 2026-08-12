@@ -558,6 +558,105 @@ function getLocationGPS() {
         // البداية
         renderProducts('all');
     </script>
+<script>
+// دالة تحديد الموقع عبر الـ GPS وتخزينها تلقائياً
+function getLocationGPS() {
+    const statusText = document.getElementById('gps-status');
+    
+    if (!navigator.geolocation) {
+        alert("متصفحك لا يدعم تحديد الموقع الجغرافي");
+        return;
+    }
 
+    if(statusText) statusText.innerText = "⏳ جاري التقاط إحداثيات الـ GPS بدقة...";
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            // تخزين الإحداثيات في المتغير العام ليتم حفظها مع الطلب
+            window.userGPSLocation = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+            
+            // تحديث النص الظاهر تحت الزر لتأكيد الحفظ
+            if(statusText) {
+                statusText.innerHTML = `LOCKED: ${window.userGPSLocation}`;
+                statusText.style.color = "#00ff66";
+            }
+        },
+        (error) => {
+            alert("فشل تحديد الموقع. تأكد من تفعيل الـ GPS وصلاحيات الموقع في متصفحك.");
+        },
+        { enableHighAccuracy: true }
+    );
+}
+
+// تفعيل التقاط زر تأكيد المهمة وعرض شاشة العداد التنازلي
+document.addEventListener('DOMContentLoaded', () => {
+    // البحث عن نموذج (Form) إتمام الطلب في النافذة المنبثقة
+    const checkoutForm = document.querySelector('#checkout-modal form');
+    
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // منع إعادة تحميل الصفحة الافتراضي
+
+            // إخفاء نافذة إتمام الطلب الحالية
+            const modal = document.getElementById('checkout-modal');
+            if(modal) modal.classList.add('hidden');
+
+            // تشغيل واجهة "طلبك في طريق اليك" والعداد التنازلي
+            showTrackingScreen();
+        });
+    }
+});
+
+// دالة واجهة العداد التنازلي (15 دقيقة)
+function showTrackingScreen() {
+    let trackingDiv = document.getElementById('ninja-tracking-screen');
+    if (!trackingDiv) {
+        trackingDiv = document.createElement('div');
+        trackingDiv.id = 'ninja-tracking-screen';
+        trackingDiv.className = 'fixed inset-0 z-[300] bg-black/95 flex items-center justify-center p-4';
+        document.body.appendChild(trackingDiv);
+    }
+
+    trackingDiv.innerHTML = `
+        <div class="glass-card w-full max-w-md rounded-3xl p-6 border border-[#00ff66]/40 text-center shadow-[0_0_50px_rgba(0,255,102,0.2)] bg-black/90">
+            <div class="text-[#00ff66] text-5xl mb-4 animate-bounce">
+                <i class="fa-solid fa-person-biking"></i>
+            </div>
+            <h2 class="text-2xl font-black text-[#00ff66] mb-2">تم تسجيل المهمة بنجاح!</h2>
+            <p class="text-gray-300 text-sm mb-6">طلبك الآن في طريق اليك بواسطة شريك التوصيل.</p>
+            
+            <div class="bg-black/60 border border-white/10 rounded-2xl p-4 mb-6">
+                <span class="block text-xs text-gray-400 mb-1">الوقت المتبقي للوصول</span>
+                <div id="countdown-timer" class="text-4xl font-black text-[#ff6600] font-graffiti">15:00</div>
+            </div>
+
+            <button onclick="document.getElementById('ninja-tracking-screen').remove(); location.reload();" class="w-full py-3 bg-[#00ff66] text-black font-bold rounded-xl shadow-[0_0_15px_rgba(0,255,102,0.4)]">
+                العودة للرئيسية
+            </button>
+        </div>
+    `;
+
+    // بدء عد تنازلي للوصول (15 دقيقة = 900 ثانية)
+    let timeLeft = 15 * 60;
+    const timerInterval = setInterval(() => {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        
+        const timerDisplay = document.getElementById('countdown-timer');
+        if (timerDisplay) {
+            timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            if (timerDisplay) timerDisplay.innerText = "وصل النينجا! 🥷";
+        }
+        timeLeft--;
+    }, 1000);
+}
+</scrحقيقيcrsrscscrrscrscscrcrsscrcrحrحققيق
 </body>
 </html>

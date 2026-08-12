@@ -10,30 +10,357 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ستايل الشبح المتفاعل */
-.ghost-ninja {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    font-size: 60px;
-    z-index: 1000;
-    cursor: pointer;
-    opacity: 0.6; /* شبه خفي */
-    transition: all 0.3s;
-    animation: float 3s ease-in-out infinite, shake 5s ease-in-out infinite;
-}
-
-.ghost-ninja:hover { opacity: 1; transform: scale(1.1); }
-
-/* حركات الشبح */
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-@keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
-
-/* تأثير الغمز */
-.blink { animation: blink 4s infinite; }
-@keyframes blink { 0%, 45%, 55%, 100% { content: "👻"; } 50% { content: "😑"; } }
-        
         :root {
+            --neon-green: #00ff66;
+            --neon-pink: #ff00ff;
+            --neon-orange: #ff6600;
+            --carbon-black: #0a0a0c;
+            --glass: rgba(10, 10, 12, 0.9);
+        }
+
+        body {
+            background-color: var(--carbon-black);
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 102, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 20%);
+        }
+
+        .font-graffiti { font-family: 'Permanent Marker', cursive; }
+
+        /* ستايل الشبح المتفاعل */
+        .ghost-ninja {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 60px;
+            z-index: 1000;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s;
+            animation: float 3s ease-in-out infinite, shake 5s ease-in-out infinite;
+        }
+        .ghost-ninja:hover { opacity: 1; transform: scale(1.1); }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+        .blink { animation: blink 4s infinite; }
+        @keyframes blink { 0%, 45%, 55%, 100% { content: "👻"; } 50% { content: "😑"; } }
+
+        /* محرك الكائنات الطائرة */
+        .floating-entity {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            filter: drop-shadow(0 0 10px var(--neon-green));
+            opacity: 0;
+            animation: floatLifecycle 15s linear forwards;
+        }
+
+        @keyframes floatLifecycle {
+            0% { transform: translate(var(--start-x), 110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translate(var(--end-x), -10vh) rotate(360deg); opacity: 0; }
+        }
+
+        .product-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px;
+        }
+
+        .biting-btn {
+            position: relative;
+            background: var(--neon-green);
+            color: black;
+            font-weight: 900;
+            height: 75px;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 15px;
+        }
+
+        .jaw {
+            position: absolute;
+            left: 0; width: 100%; height: 0;
+            background: #111;
+            display: flex;
+            justify-content: space-around;
+            transition: height 0.15s ease-in-out;
+            z-index: 10;
+        }
+        .jaw-top { top: 0; align-items: flex-end; }
+        .jaw-bottom { bottom: 0; align-items: flex-start; }
+        .tooth { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; }
+        .jaw-top .tooth { border-top: 15px solid #eee; margin-bottom: -1px; }
+        .jaw-bottom .tooth { border-bottom: 15px solid #eee; margin-top: -1px; }
+
+        .biting-btn:hover .jaw { height: 40%; }
+        .biting-btn:active .jaw { height: 50%; }
+
+        .neon-glow { text-shadow: 0 0 10px var(--neon-green); }
+        .glass-card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--carbon-black); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 10px; }
+
+        @keyframes pulse-eye {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .ninja-eye { animation: pulse-eye 2s infinite; }
+    </style>
+</head>
+<body>
+
+    <!-- الشبح المتفاعل -->
+    <div id="ninja-ghost" class="ghost-ninja blink" onclick="interactGhost()">👻</div>
+    <div id="ghost-bubble" class="hidden fixed bottom-28 right-8 bg-[#00ff66] text-black px-4 py-2 rounded-2xl font-bold shadow-lg animate-bounce z-[1000]">
+        أهلاً يا نينجا! 🥷✨
+    </div>
+
+    <!-- محرك الكائنات الطائرة -->
+    <div id="entity-container"></div>
+
+    <!-- الهيدر الأسطوري -->
+    <header class="fixed top-0 w-full z-[100] glass-card px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="relative w-12 h-12 bg-black rounded-full border-2 border-[#00ff66] flex items-center justify-center overflow-hidden">
+                <div class="absolute w-full h-3 bg-[#00ff66] opacity-20"></div>
+                <div class="flex gap-2 relative z-10">
+                    <div class="w-2 h-2 bg-[#00ff66] rounded-full ninja-eye shadow-[0_0_8px_#00ff66]"></div>
+                    <div class="w-2 h-2 bg-[#00ff66] rounded-full ninja-eye shadow-[0_0_8px_#00ff66]"></div>
+                </div>
+            </div>
+            <div>
+                <h1 class="font-graffiti text-2xl neon-glow leading-none">NINJA STORE</h1>
+                <p class="text-[10px] uppercase font-bold text-[#00ff66] tracking-tighter">الوضع: الأسطوري ∞</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-5">
+            <button onclick="openAdmin()" class="text-[10px] font-bold text-gray-500 hover:text-white transition uppercase tracking-widest">إدارة النظام</button>
+            <div class="relative cursor-pointer group" onclick="toggleCart()">
+                <div id="cart-count" class="absolute -top-2 -right-2 bg-[#ff00ff] text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-lg">0</div>
+                <i class="fa-solid fa-cart-shopping text-2xl text-[#00ff66] group-hover:scale-110 transition"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- الأقسام -->
+    <nav class="mt-24 px-4 overflow-x-auto no-scrollbar py-4 flex gap-3">
+        <button onclick="filter('all')" class="cat-btn active glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border-[#00ff66]">الكل</button>
+        <button onclick="filter('veg')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">الخضروات</button>
+        <button onclick="filter('dairy')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">الألبان والبيض</button>
+        <button onclick="filter('grains')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">الحبوب</button>
+        <button onclick="filter('juice')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">العصائر</button>
+    </nav>
+
+    <!-- المنتجات -->
+    <main class="px-4 pb-20">
+        <div id="product-grid" class="product-grid">
+            <!-- المنتجات تحقن هنا -->
+        </div>
+    </main>
+
+    <!-- سلة التسوق -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/90 z-[150] hidden backdrop-blur-md" onclick="toggleCart()"></div>
+    <div id="cart-drawer" class="fixed top-0 left-0 h-full w-full max-w-md glass-card z-[160] translate-x-[-100%] transition-transform duration-500 flex flex-col">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <h2 class="font-graffiti text-3xl text-[#00ff66]">YOUR STASH</h2>
+            <button onclick="toggleCart()" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+        </div>
+        
+        <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-4 no-scrollbar"></div>
+
+        <div class="p-6 bg-black/40 border-t border-white/10 space-y-4">
+            <div class="flex justify-between text-sm">
+                <span class="text-gray-400">المجموع الفرعي</span>
+                <span id="subtotal">0.00 د.ج</span>
+            </div>
+            <div class="flex justify-between text-sm text-[#ff6600] font-bold">
+                <span>توصيل نينجا سريع</span>
+                <span id="delivery-fee">0.00 د.ج</span>
+            </div>
+            <div class="flex justify-between text-2xl font-black neon-glow pt-2 border-t border-white/10">
+                <span>الإجمالي</span>
+                <span id="total-price">0.00 د.ج</span>
+            </div>
+
+            <!-- زر العض -->
+            <button onclick="openCheckout()" class="biting-btn w-full mt-4 group">
+                <div class="jaw jaw-top">
+                    <div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div>
+                </div>
+                إتمام الطلب الآن
+                <div class="jaw jaw-bottom">
+                    <div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- مودال الطلب -->
+    <div id="checkout-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-xl" onclick="closeCheckout()"></div>
+        <div class="relative glass-card w-full max-w-lg rounded-3xl p-8 border-[#00ff66]/30">
+            <h3 class="text-3xl font-black text-center text-[#00ff66] mb-8">إحداثيات التوصيل</h3>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="fname" placeholder="الاسم الأول" required class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66] text-white">
+                    <input type="text" id="lname" placeholder="اللقب" required class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66] text-white">
+                </div>
+                <input type="tel" id="phone" placeholder="رقم الهاتف" required class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66] text-white">
+                
+                <!-- زر الـ GPS التلقائي -->
+                <div class="text-center">
+                    <button type="button" onclick="getLocationGPS()" class="w-full py-4 px-6 rounded-xl font-bold text-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black shadow-[0_0_20px_rgba(0,255,102,0.4)] transition-all flex items-center justify-center gap-3 border border-[#00ff66]">
+                        <i class="fa-solid fa-location-crosshairs text-2xl animate-pulse"></i>
+                        <span>تحديد موقعي تلقائياً عبر GPS</span>
+                    </button>
+                    <p id="gps-status" class="text-xs text-[#00ff66] mt-2 font-bold">لم يتم تحديد الموقع بعد</p>
+                    <input type="hidden" id="final-location">
+                </div>
+
+                <!-- زر تأكيد المهمة الواضح -->
+                <div class="pt-2">
+                    <button type="button" onclick="confirmOrder()" class="w-full py-4 bg-[#00ff66] text-black font-black text-xl rounded-2xl shadow-[0_0_20px_rgba(0,255,102,0.4)] hover:scale-[1.02] transition-all">
+                        تأكيد المهمة 🥷
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- كود الجافاسكريبت الموحد -->
+    <script>
+        // تفاعل الشبح
+        function interactGhost() {
+            const ghost = document.getElementById('ninja-ghost');
+            const bubble = document.getElementById('ghost-bubble');
+            ghost.innerText = "😂";
+            bubble.classList.remove('hidden');
+            bubble.innerText = "هههههه! طلبك قيد المعالجة 🥷";
+            setTimeout(() => {
+                ghost.innerText = "👻";
+                bubble.classList.add('hidden');
+            }, 3000);
+        }
+
+        // تحديد الموقع عبر GPS
+        function getLocationGPS() {
+            const statusText = document.getElementById('gps-status');
+            const locationInput = document.getElementById('final-location');
+            
+            if (!navigator.geolocation) {
+                alert("متصفحك لا يدعم تحديد الموقع الجغرافي");
+                return;
+            }
+
+            if(statusText) {
+                statusText.innerText = "⏳ جاري التقاط إحداثيات الـ GPS بدقة...";
+                statusText.style.color = "#ff6600";
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const coords = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    
+                    if(locationInput) locationInput.value = coords;
+                    
+                    if(statusText) {
+                        statusText.innerHTML = `✅ LOCKED: ${coords}`;
+                        statusText.style.color = "#00ff66";
+                    }
+                },
+                (error) => {
+                    if(statusText) {
+                        statusText.innerHTML = "❌ فشل تحديد الموقع. تفعيل الـ GPS مطلوب.";
+                        statusText.style.color = "#ff0055";
+                    }
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
+        // تأكيد المهمة وإظهار العد التنازلي بـ 15 دقيقة
+        function confirmOrder() {
+            const modal = document.getElementById('checkout-modal');
+            if (modal) modal.classList.add('hidden');
+
+            let trackingDiv = document.getElementById('ninja-tracking-screen');
+            if (!trackingDiv) {
+                trackingDiv = document.createElement('div');
+                trackingDiv.id = 'ninja-tracking-screen';
+                trackingDiv.className = 'fixed inset-0 z-[300] bg-black/95 flex items-center justify-center p-4';
+                document.body.appendChild(trackingDiv);
+            }
+
+            trackingDiv.innerHTML = `
+                <div class="glass-card w-full max-w-md rounded-3xl p-6 border border-[#00ff66]/40 text-center shadow-[0_0_50px_rgba(0,255,102,0.2)] bg-black/90">
+                    <div class="text-[#00ff66] text-5xl mb-4 animate-bounce">
+                        <i class="fa-solid fa-person-biking"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-[#00ff66] mb-2">تم تسجيل المهمة بنجاح!</h2>
+                    <p class="text-gray-300 text-sm mb-6">طلبك الآن في طريق اليك بواسطة شريك التوصيل.</p>
+                    
+                    <div class="bg-black/60 border border-white/10 rounded-2xl p-4 mb-6">
+                        <span class="block text-xs text-gray-400 mb-1">الوقت المتبقي للوصول</span>
+                        <div id="countdown-timer" class="text-4xl font-black text-[#ff6600] font-graffiti">15:00</div>
+                    </div>
+
+                    <button onclick="document.getElementById('ninja-tracking-screen').remove(); location.reload();" class="w-full py-3 bg-[#00ff66] text-black font-bold rounded-xl shadow-[0_0_15px_rgba(0,255,102,0.4)]">
+                        العودة للرئيسية
+                    </button>
+                </div>
+            `;
+
+            let timeLeft = 15 * 60;
+            const timerInterval = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                
+                const timerDisplay = document.getElementById('countdown-timer');
+                if (timerDisplay) {
+                    timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (timerDisplay) timerDisplay.innerText = "وصل النينجا! 🥷";
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        // دوال مساعدة لفتح وإغلاق النوافذ (إذا لم تكن موجودة أصلًا في سكربتاتك الأخرى)
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('cart-overlay');
+            drawer.classList.toggle('translate-x-[-100%]');
+            overlay.classList.toggle('hidden');
+        }
+
+        function openCheckout() {
+            toggleCart();
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeCheckout() {
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
             --neon-green: #00ff66;
             --neon-pink: #ff00ff;
             --neon-orange: #ff6600;

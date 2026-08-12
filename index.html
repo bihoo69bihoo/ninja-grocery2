@@ -206,7 +206,51 @@
                 </div>
                 <input type="tel" id="phone" placeholder="رقم الهاتف" required class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66]">
                 <div class="relative">
-                    <input type="text" id="address" placeholder="عنوان التوصيل (يدوي)" required class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66] pr-12">
+                    <!-- أضف هذا الزر الكبير والمضيء مكان العنوان القديم -->
+<div class="mb-6 text-center">
+    <button type="button" onclick="getLocationGPS()" class="w-full py-4 px-6 rounded-xl font-bold text-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-black shadow-[0_0_20px_rgba(0,255,102,0.4)] transition-all flex items-center justify-center gap-3 border border-[#00ff66]">
+        <i class="fa-solid fa-location-crosshairs text-2xl animate-pulse"></i>
+        <span>تحديد موقعي تلقائياً عبر GPS 📍</span>
+    </button>
+    <p id="gps-status" class="text-sm text-gray-400 mt-2">لم يتم تحديد الموقع بعد</p>
+    <input type="hidden" id="final-location" name="location">
+</div>
+
+<!-- كود الجافاسكريبت لتفعيل الـ GPS (أضفه في قسم <script> أو نهاية الملف) -->
+<script>
+function getLocationGPS() {
+    const statusText = document.getElementById('gps-status');
+    const locationInput = document.getElementById('final-location');
+    
+    if (!navigator.geolocation) {
+        statusText.innerHTML = "❌ المتصفح لا يدعم خاصية تحديد الموقع";
+        statusText.style.color = "#ff0055";
+        return;
+    }
+
+    statusText.innerHTML = "⏳ جاري تحديد موقعك بدقة عبر الـ GPS...";
+    statusText.style.color = "#ff6600";
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            // حفظ الإحداثيات في الحقل المخفي لترسل مع الطلب
+            locationInput.value = `Lat: ${lat}, Lon: ${lon}`;
+            
+            statusText.innerHTML = `✅ تم تحديد الموقع بنجاح! (خط عرض: ${lat.toFixed(4)}, خط طول: ${lon.toFixed(4)})`;
+            statusText.style.color = "#00ff66";
+        },
+        (error) => {
+            statusText.innerHTML = "❌ فشل في تحديد الموقع. يجدر التأكد من تفعيل الـ GPS والصلاحيات.";
+            statusText.style.color = "#ff0055";
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+}
+</script>
+
                     <button type="button" onclick="lockGPS()" class="absolute right-2 top-2 p-2 bg-[#00ff66] text-black rounded-lg hover:bg-white transition shadow-lg">
                         <i class="fa-solid fa-location-crosshairs"></i>
                     </button>

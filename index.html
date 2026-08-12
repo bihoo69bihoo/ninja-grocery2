@@ -10,6 +10,53 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        <!-- بداية كود الشبح المتطور -->
+<style>
+    /* 1. التنسيق والمظهر */
+    #ghost-wrapper { position: fixed; bottom: 50px; right: 50px; z-index: 9999; cursor: pointer; transition: all 0.3s; }
+    #ghost-body { width: 120px; height: 120px; background-size: contain; background-repeat: no-repeat; transition: all 0.5s; }
+    
+    /* الأنيميشن */
+    .normal { background-image: url('https://img.icons8.com/color/96/ghost.png'); animation: float 3s infinite ease-in-out; }
+    .evil { background-image: url('https://img.icons8.com/fluency/96/spider.png'); animation: shake 0.3s infinite; transform: scale(1.3); }
+    
+    #ghost-text { position: absolute; bottom: 130px; right: 0; background: #333; color: #fff; padding: 10px; border-radius: 10px; opacity: 0; transition: 0.5s; width: 150px; text-align: center; border: 2px solid #ff0000; }
+    
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    @keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
+</style>
+
+<div id="ghost-wrapper" onclick="speak()">
+    <div id="ghost-text">مرحباً بك!</div>
+    <div id="ghost-body" class="normal"></div>
+</div>
+
+<script>
+    const ghost = document.getElementById('ghost-body');
+    const text = document.getElementById('ghost-text');
+    const msgs = ["أنا أراقبك...", "لا تغلق المتجر!", "هل أعجبك المنتج؟", "هاهاها! شرير!", "أنا هنا دائماً!"];
+
+    // وظيفة الكلام
+    function speak() {
+        text.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+        text.style.opacity = "1";
+        setTimeout(() => text.style.opacity = "0", 3000);
+    }
+
+    // وظيفة التحول كل 5 ثواني
+    setInterval(() => {
+        ghost.classList.toggle('normal');
+        ghost.classList.toggle('evil');
+        
+        if (ghost.classList.contains('evil')) {
+            text.innerText = "هاهاهاها! 🕷️👹";
+            text.style.opacity = "1";
+            setTimeout(() => text.style.opacity = "0", 2000);
+        }
+    }, 5000);
+</script>
+<!-- نهاية كود الشبح المتطور -->
+    
         :root {
             --neon-green: #00ff66;
             --neon-pink: #ff00ff;

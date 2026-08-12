@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NINJA STORE | GOD MODE ∞</title>
+    <!-- الروابط الأساسية: Tailwind & Fonts & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --neon-green: #00ff66;
+            --neon-pink: #ff00ff;
+            --neon-orange: #ff6600;
+            --carbon-black: #0a0a0c;
+            --glass: rgba(10, 10, 12, 0.9);
+        }
+
+        body {
+            background-color: var(--carbon-black);
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 102, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 20%);
+        }
+
+        .font-graffiti { font-family: 'Permanent Marker', cursive; }
+
+        /* محرك الكائنات الطائرة */
+        .floating-entity {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            filter: drop-shadow(0 0 10px var(--neon-green));
+            opacity: 0;
+            animation: floatLifecycle 15s linear forwards;
+        }
+
+        @keyframes floatLifecycle {
+            0% { transform: translate(var(--start-x), 110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translate(var(--end-x), -10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* التصميم الصارم: عمودين دائماً */
+        .product-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px;
+        }
+
+        /* زر العض التفاعلي */
+        .biting-btn {
+            position: relative;
+            background: var(--neon-green);
+            color: black;
+            font-weight: 900;
+            height: 75px;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 15px;
+        }
+
+        .jaw {
+            position: absolute;
+            left: 0; width: 100%; height: 0;
+            background: #111;
+            display: flex;
+            justify-content: space-around;
+            transition: height 0.15s ease-in-out;
+            z-index: 10;
+        }
+        .jaw-top { top: 0; align-items: flex-end; }
+        .jaw-bottom { bottom: 0; align-items: flex-start; }
+        .tooth { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; }
+        .jaw-top .tooth { border-top: 15px solid #eee; margin-bottom: -1px; }
+        .jaw-bottom .tooth { border-bottom: 15px solid #eee; margin-top: -1px; }
+
+        .biting-btn:hover .jaw { height: 40%; }
+        .biting-btn:active .jaw { height: 50%; }
+
+        /* تأثيرات النيون */
+        .neon-glow { text-shadow: 0 0 10px var(--neon-green); }
+        .neon-border { border: 2px solid var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
+        .glass-card { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+
+        /* تخصيص السكرول */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--carbon-black); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 10px; }
+
+        /* أنيميشن */
+        @keyframes pulse-eye {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .ninja-eye { animation: pulse-eye 2s infinite; }
+
+        /* Responsive Fixes */
+        @media (max-width: 640px) {
+            .product-grid { gap: 8px; }
+            .card-title { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- محرك الكائنات الطائرة -->
+    <div id="entity-container"></div>
+
+    <!-- الهيدر الأسطوري -->
+    <header class="fixed top-0 w-full z-[100] glass-card px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="relative w-12 h-12 bg-black rounded-full border-2 border-[#00ff66] flex items-center justify-center overflow-hidden">
+                <div class="absolute w-full h-3 bg-[#00ff66] opacity-20"></div>
+                <div class="flex gap-2 relative z-10">
+                    <div class="w-2 h-2 bg-[#00ff66] rounded-full ninja-eye shadow-[0_0_8px_#00ff66]"></div>
+                    <div class="w-2 h-2 bg-[#00ff66] rounded-full ninja-eye shadow-[0_0_8px_#00ff66]"></div>
+                </div>
+            </div>
+            <div>
+                <h1 class="font-graffiti text-2xl neon-glow leading-none">NINJA STORE</h1>
+                <p class="text-[10px] uppercase font-bold text-[#00ff66] tracking-tighter">الوضع: الأسطوري ∞</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-5">
+            <button onclick="openAdmin()" class="text-[10px] font-bold text-gray-500 hover:text-white transition uppercase tracking-widest">إدارة النظام</button>
+            <div class="relative cursor-pointer group" onclick="toggleCart()">
+                <div id="cart-count" class="absolute -top-2 -right-2 bg-[#ff00ff] text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-lg">0</div>
+                <i class="fa-solid fa-cart-shopping text-2xl text-[#00ff66] group-hover:scale-110 transition"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- الأقسام -->
+    <nav class="mt-24 px-4 overflow-x-auto no-scrollbar py-4 flex gap-3">
+        <button onclick="filter('all')" class="cat-btn active glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border-[#00ff66]">الكل</button>
+        <button onclick="filter('veg')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">الخضروات</button>
+        <button onclick="filter('dairy')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">الألبان والبيض</button>
+        <button onclick="filter('grains')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">الحبوب</button>
+        <button onclick="filter('juice')" class="cat-btn glass-card px-6 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all">العصائر</button>
+    </nav>
+
+    <!-- المنتجات -->
+    <main class="px-4 pb-20">
+        <div id="product-grid" class="product-grid">
+            <!-- المنتجات تحقن هنا -->
+        </div>
+    </main>
+
+    <!-- سلة التسوق -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/90 z-[150] hidden backdrop-blur-md" onclick="toggleCart()"></div>
+    <div id="cart-drawer" class="fixed top-0 left-0 h-full w-full max-w-md glass-card z-[160] translate-x-[-100%] transition-transform duration-500 flex flex-col">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <h2 class="font-graffiti text-3xl text-[#00ff66]">YOUR STASH</h2>
+            <button onclick="toggleCart()" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+        </div>
+        
+        <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-4 no-scrollbar">
+            <!-- عناصر السلة -->
+        </div>
+
+        <div class="p-6 bg-black/40 border-t border-white/10 space-y-4">
+            <div class="flex justify-between text-sm">
+                <span class="text-gray-400">المجموع الفرعي</span>
+                <span id="subtotal">0.00 د.ج</span>
+            </div>
+            <div class="flex justify-between text-sm text-[#ff6600] font-bold">
+                <span>توصيل نينجا سريع</span>
+                <span id="delivery-fee">0.00 د.ج</span>
+            </div>
+            <div class="flex justify-between text-2xl font-black neon-glow pt-2 border-t border-white/10">
+                <span>الإجمالي</span>
+                <span id="total-price">0.00 د.ج</span>
+            </div>
+
+            <!-- زر العض -->
+            <button onclick="openCheckout()" class="biting-btn w-full mt-4 group">
+                <div class="jaw jaw-top">
+                    <div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div>
+                </div>
+                إتمام الطلب الآن
+                <div class="jaw jaw-bottom">
+                    <div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- مودال الطلب -->
+    <div id="checkout-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-xl" onclick="closeCheckout()"></div>
+        <div class="relative glass-card w-full max-w-lg rounded-3xl p-8 border-[#00ff66]/30">
+            <h3 class="text-3xl font-black text-center text-[#00ff66] mb-8">إحداثيات التوصيل</h3>
+            <form id="order-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="fname" placeholder="الاسم الأول" required class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66]">
+                    <input type="text" id="lname" placeholder="اللقب" required class="bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66]">
+                </div>
+                <input type="tel" id="phone" placeholder="رقم الهاتف" required class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66]">
+                <div class="relative">
+                    <input type="text" id="address" placeholder="عنوان التوصيل (يدوي)" required class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff66] pr-12">
+                    <button type="button" onclick="lockGPS()" class="absolute right-2 top-2 p-2 bg-[#00ff66] text-black rounded-lg hover:bg-white transition shadow-lg">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                    </button>
+                </div>
+                <div id="gps-status" class="text-[10px] text-[#00ff66] font-bold text-center italic"></div>
+                <button type="submit" class="w-full py-5 bg-[#00ff66] text-black font-black text-lg rounded-2xl hover:scale-105 transition shadow-[0_0_20px_#00ff66]">تأكيد المهمة</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- بوابة الإدارة -->
+    <div id="admin-modal" class="fixed inset-0 z-[250] hidden glass-card backdrop-blur-3xl overflow-y-auto">
+        <!-- شاشة تسجيل الدخول -->
+        <div id="admin-login-view" class="h-full flex items-center justify-center p-6">
+            <div class="bg-black/60 p-10 rounded-[2.5rem] border border-[#ff6600]/30 max-w-sm w-full text-center">
+                <i class="fa-solid fa-user-shield text-5xl text-[#ff6600] mb-6"></i>
+                <h2 class="font-graffiti text-3xl mb-8">ADMIN AUTH</h2>
+                <input type="email" id="adm-user" placeholder="Email" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl mb-4 outline-none focus:border-[#ff6600]">
+                <input type="password" id="adm-pass" placeholder="Password" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl mb-8 outline-none focus:border-[#ff6600]">
+                <button onclick="handleAdminLogin()" class="w-full bg-[#ff6600] text-white font-black py-4 rounded-xl shadow-lg hover:bg-[#ff8533]">فتح المصفوفة</button>
+                <button onclick="closeAdmin()" class="mt-4 text-xs opacity-50 uppercase font-bold tracking-widest">إغلاق</button>
+            </div>
+        </div>
+
+        <!-- لوحة التحكم -->
+        <div id="admin-dashboard-view" class="hidden p-6 lg:p-10 min-h-screen">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                <div>
+                    <h2 class="font-graffiti text-5xl text-[#00ff66] leading-none mb-2">COMMAND CENTER</h2>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">مرحباً بك في مركز التحكم بمتجر نينجا</p>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="wipeDatabase()" class="bg-red-600/10 text-red-500 border border-red-600/30 px-6 py-2 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">مسح كافة البيانات</button>
+                    <button onclick="adminLogout()" class="bg-white text-black px-6 py-2 rounded-xl text-xs font-bold hover:bg-[#ff00ff] hover:text-white transition">خروج</button>
+                </div>
+            </div>
+
+            <!-- إحصائيات المبيعات -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-card p-8 rounded-3xl border-r-8 border-[#00ff66] shadow-xl">
+                    <p class="text-[10px] font-black uppercase text-gray-500 mb-2">إجمالي مبيعات اليوم</p>
+                    <h4 id="today-revenue" class="text-4xl font-black text-white">0.00 د.ج</h4>
+                </div>
+                <div class="glass-card p-8 rounded-3xl border-r-8 border-[#ff00ff] shadow-xl">
+                    <p class="text-[10px] font-black uppercase text-gray-500 mb-2">طلبات اليوم</p>
+                    <h4 id="today-orders" class="text-4xl font-black text-white">0</h4>
+                </div>
+                <div class="glass-card p-8 rounded-3xl border-r-8 border-[#ff6600] shadow-xl">
+                    <p class="text-[10px] font-black uppercase text-gray-500 mb-2">رسوم التوصيل المحصلة</p>
+                    <h4 id="total-delivery-fees" class="text-4xl font-black text-white">0.00 د.ج</h4>
+                </div>
+            </div>
+
+            <h3 class="font-graffiti text-3xl text-white mb-6 uppercase italic">Mission Manifest (Historical Log)</h3>
+            
+            <div class="glass-card rounded-[2rem] overflow-hidden shadow-2xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-white/5 border-b border-white/10 text-[10px] uppercase font-black tracking-widest text-gray-500">
+                            <tr>
+                                <th class="p-6">رقم المهمة</th>
+                                <th class="p-6">العميل / الهاتف</th>
+                                <th class="p-6">العنوان / GPS</th>
+                                <th class="p-6">المنتجات (الحمولة)</th>
+                                <th class="p-6">القيمة الكلية</th>
+                                <th class="p-6">التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-list" class="divide-y divide-white/5">
+                            <!-- الطلبات تظهر هنا -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- منطق اللعبة والبرمجة -->
+    <script>
+        // قاعدة البيانات
+        const PRODUCTS = [
+            { id: 1, name: "طماطم جرافيتي", price: 150, cat: "veg", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" },
+            { id: 2, name: "حليب نينجا صلب", price: 110, cat: "dairy", img: "https://images.unsplash.com/photo-1550583724-125581fe2f8a?w=400" },
+            { id: 3, name: "بيض التنين (30 حبة)", price: 650, cat: "dairy", img: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=400" },
+            { id: 4, name: "مكرونة الفايد", price: 80, cat: "grains", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400" },
+            { id: 5, name: "عصير الصاعقة", price: 250, cat: "juice", img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400" },
+            { id: 6, name: "أرز النينجا الأسمر", price: 350, cat: "grains", img: "https://images.unsplash.com/photo-1512339183232-73ee3087b3f0?w=400" },
+            { id: 7, name: "تفاح النيون", price: 400, cat: "veg", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400" },
+            { id: 8, name: "شيبس الشوغن", price: 180, cat: "veg", img: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=400" },
+        ];
+
+        let cart = [];
+        let userGPS = null;
+        let orders = JSON.parse(localStorage.getItem('ninja_store_orders')) || [];
+
+        // تشغيل الخلفية
+        function spawnEntity() {
+            const container = document.getElementById('entity-container');
+            const icons = ['fa-shuriken', 'fa-user-ninja', 'fa-bolt', 'fa-skull'];
+            const entity = document.createElement('div');
+            const startX = Math.random() * 100 + 'vw';
+            const endX = (Math.random() * 200 - 100) + 'vw';
+            
+            entity.className = 'floating-entity fa-solid ' + icons[Math.floor(Math.random() * icons.length)];
+            entity.style.setProperty('--start-x', startX);
+            entity.style.setProperty('--end-x', endX);
+            entity.style.left = startX;
+            entity.style.fontSize = Math.random() * 20 + 10 + 'px';
+            entity.style.color = Math.random() > 0.5 ? '#00ff66' : '#ff00ff';
+
+            container.appendChild(entity);
+            setTimeout(() => entity.remove(), 15000);
+        }
+        setInterval(spawnEntity, 10000);
+
+        // واجهة العرض
+        function renderProducts(filter) {
+            const grid = document.getElementById('product-grid');
+            const items = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === filter);
+            grid.innerHTML = items.map(p => `
+                <div class="glass-card rounded-2xl p-3 flex flex-col group animate-fade-in">
+                    <div class="h-32 md:h-44 rounded-xl overflow-hidden mb-3 relative">
+                        <img src="${p.img}" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                    </div>
+                    <h3 class="font-bold text-xs md:text-sm card-title line-clamp-1 mb-1">${p.name}</h3>
+                    <p class="text-[9px] opacity-40 uppercase font-black mb-3">${p.cat}</p>
+                    <div class="mt-auto flex justify-between items-center">
+                        <span class="text-[#00ff66] font-black text-xs md:text-lg">${p.price} د.ج</span>
+                        <button onclick="addToCart(${p.id})" class="bg-[#00ff66] text-black w-8 h-8 rounded-lg flex items-center justify-center hover:scale-110 active:scale-95 transition">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filter(cat) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('border-[#00ff66]'));
+            event.target.classList.add('border-[#00ff66]');
+            renderProducts(cat);
+        }
+
+        // السلة
+        function toggleCart() {
+            const dr = document.getElementById('cart-drawer');
+            const ov = document.getElementById('cart-overlay');
+            const open = dr.classList.contains('translate-x-[0%]');
+            dr.classList.toggle('translate-x-[0%]', !open);
+            dr.classList.toggle('translate-x-[-100%]', open);
+            ov.classList.toggle('hidden', open);
+        }
+
+        function addToCart(id) {
+            const prod = PRODUCTS.find(p => p.id === id);
+            const exists = cart.find(c => c.id === id);
+            if(exists) exists.qty++;
+            else cart.push({...prod, qty: 1});
+            updateCart();
+            // تأثير إضافة (بسيط وتفاعلي)
+            event.target.innerHTML = '<i class="fa-solid fa-check"></i>';
+            setTimeout(() => event.target.innerHTML = '<i class="fa-solid fa-plus text-xs"></i>', 500);
+        }
+
+        function updateCart() {
+            const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+            document.getElementById('cart-count').innerText = totalQty;
+            const itemsCont = document.getElementById('cart-items');
+
+            itemsCont.innerHTML = cart.map(i => `
+                <div class="glass-card p-4 rounded-xl flex gap-4 items-center animate-fade-in">
+                    <img src="${i.img}" class="w-12 h-12 rounded-lg object-cover">
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-xs">${i.name}</h4>
+                        <p class="text-[10px] opacity-50">${i.qty} x ${i.price} د.ج</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="changeQty(${i.id}, -1)" class="w-6 h-6 border border-white/10 rounded">-</button>
+                        <span class="text-xs font-bold">${i.qty}</span>
+                        <button onclick="changeQty(${i.id}, 1)" class="w-6 h-6 border border-white/10 rounded">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const sub = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            // توصيل ذكي: 200 دج قاعدة + 10 دج لكل قطعة إضافية
+            let fee = totalQty > 0 ? 200 + (totalQty * 10) : 0;
+            if(totalQty > 10) fee = 150; // عرض التوصيل للطلبات الكبيرة
+
+            document.getElementById('subtotal').innerText = sub.toFixed(2) + ' د.ج';
+            document.getElementById('delivery-fee').innerText = fee.toFixed(2) + ' د.ج';
+            document.getElementById('total-price').innerText = (sub + fee).toFixed(2) + ' د.ج';
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(c => c.id === id);
+            item.qty += delta;
+            if(item.qty < 1) cart = cart.filter(c => c.id !== id);
+            updateCart();
+        }
+
+        // GPS وطلب
+        function openCheckout() {
+            if(cart.length === 0) return alert('السلة فارغة!');
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckout() { document.getElementById('checkout-modal').classList.add('hidden'); }
+
+        function lockGPS() {
+            const status = document.getElementById('gps-status');
+            status.innerText = "جاري الاتصال بالأقمار الصناعية...";
+            navigator.geolocation.getCurrentPosition(pos => {
+                userGPS = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                status.innerText = `LOCKED: ${userGPS.lat.toFixed(4)}, ${userGPS.lng.toFixed(4)}`;
+                document.getElementById('address').value = `GPS: [${userGPS.lat}, ${userGPS.lng}]`;
+            }, () => {
+                status.innerText = "فشل تحديد الموقع. أدخل العنوان يدوياً.";
+            });
+        }
+
+        document.getElementById('order-form').onsubmit = (e) => {
+            e.preventDefault();
+            const order = {
+                id: 'NJ' + Date.now().toString().slice(-6).toUpperCase(),
+                name: `${document.getElementById('fname').value} ${document.getElementById('lname').value}`,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                gps: userGPS,
+                items: cart.map(i => `${i.qty}x ${i.name}`).join(', '),
+                total: parseFloat(document.getElementById('total-price').innerText),
+                delivery: parseFloat(document.getElementById('delivery-fee').innerText),
+                date: new Date().toLocaleDateString('en-GB'), // التاريخ بتنسيق DD/MM/YYYY
+                fullDate: new Date().toISOString()
+            };
+
+            orders.push(order);
+            localStorage.setItem('ninja_store_orders', JSON.stringify(orders));
+            
+            alert(`تم تأكيد المهمة بنجاح! رقم الطلب: ${order.id}`);
+            cart = [];
+            updateCart();
+            closeCheckout();
+            toggleCart();
+            e.target.reset();
+        };
+
+        // الإدارة
+        function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdmin() { document.getElementById('admin-modal').classList.add('hidden'); }
+
+        function handleAdminLogin() {
+            const u = document.getElementById('adm-user').value;
+            const p = document.getElementById('adm-pass').value;
+            if(u === "bihoo162@gmail.com" && p === "nouh1234") {
+                document.getElementById('admin-login-view').classList.add('hidden');
+                document.getElementById('admin-dashboard-view').classList.remove('hidden');
+                renderAdminStats();
+            } else { alert('بيانات الدخول خاطئة!'); }
+        }
+
+        function adminLogout() {
+            document.getElementById('admin-login-view').classList.remove('hidden');
+            document.getElementById('admin-dashboard-view').classList.add('hidden');
+            closeAdmin();
+        }
+
+        function renderAdminStats() {
+            const today = new Date().toLocaleDateString('en-GB');
+            const todayOrders = orders.filter(o => o.date === today);
+            
+            const revenue = todayOrders.reduce((s, o) => s + (o.total - o.delivery), 0);
+            const deliveryFees = todayOrders.reduce((s, o) => s + o.delivery, 0);
+
+            document.getElementById('today-revenue').innerText = revenue.toFixed(2) + ' د.ج';
+            document.getElementById('today-orders').innerText = todayOrders.length;
+            document.getElementById('total-delivery-fees').innerText = deliveryFees.toFixed(2) + ' د.ج';
+
+            const list = document.getElementById('admin-orders-list');
+            list.innerHTML = orders.slice().reverse().map(o => `
+                <tr class="hover:bg-white/5 transition">
+                    <td class="p-6 font-black text-[#00ff66]">${o.id}</td>
+                    <td class="p-6">
+                        <div class="font-bold">${o.name}</div>
+                        <div class="text-[10px] opacity-40">${o.phone}</div>
+                    </td>
+                    <td class="p-6">
+                        <div class="text-xs truncate max-w-[150px]">${o.address}</div>
+                        ${o.gps ? `<a href="https://maps.google.com/?q=${o.gps.lat},${o.gps.lng}" target="_blank" class="text-blue-400 text-[10px] underline">فتح الخريطة</a>` : ''}
+                    </td>
+                    <td class="p-6 text-[10px] text-gray-400 max-w-[150px]">${o.items}</td>
+                    <td class="p-6 font-black text-[#00ff66]">${o.total} د.ج</td>
+                    <td class="p-6 text-[10px] opacity-40">${o.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        function wipeDatabase() {
+            if(confirm('هل أنت متأكد من مسح جميع السجلات التاريخية؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                orders = [];
+                localStorage.removeItem('ninja_store_orders');
+                renderAdminStats();
+            }
+        }
+
+        // البداية
+        renderProducts('all');
+    </script>
+
+</body>
+</html>
